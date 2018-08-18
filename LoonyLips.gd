@@ -10,3 +10,8 @@ func _ready():
 
 func _on_TextBox_text_entered(new_text):
 	$Blackboard/StoryText.text = new_text
+
+
+func _on_SubmitTextButton_pressed():
+	var new_text = $Blackboard/TextBox.get_text()
+	_on_TextBox_text_entered(new_text)
