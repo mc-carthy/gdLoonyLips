@@ -1,25 +1,14 @@
 extends Node2D
 
 var playerWords = []
-var template = [
-		{
-		"prompt":['a name', 'a thing', 'a feeling', 'another feeling', 'some things'],
-		"story":"Once upon a time a %s ate a %s and felt very %s. It was a %s day for all good %s."
-		},
-		{
-		"prompt":['a thing', 'a name', 'an adjective', 'a thing'],
-		"story":"There once was a %s called %s that lived as %s as a %s."
-		}
-	]
 
+var import_text
 var current_story
 
 func _ready():
-	randomize()
-	var ran_num = randi() % template.size()
-	print(ran_num)
-	current_story = template[ran_num]
-	$Blackboard/StoryText.text = "Welcome to the game. \nWe're going to tell a story and have a great time.\nCan I have " + current_story.prompt[playerWords.size()] + ", please?"
+	import_text = get_from_json("other_strings.json")
+	set_random_story()
+	$Blackboard/StoryText.text = import_text.intro_text
 	$Blackboard/TextBox.text = ""
 
 func _on_TextBox_text_entered(new_text):
@@ -39,7 +28,7 @@ func prompt_player():
 	if is_story_done():
 		tell_story()
 	else:
-		$Blackboard/StoryText.text = ("Can I have " + current_story.prompt[playerWords.size()] + ", please?")
+		$Blackboard/StoryText.text = import_text.prompt % current_story.prompt[playerWords.size()]
 
 func tell_story():
 	$Blackboard/StoryText.text = current_story.story % playerWords
@@ -47,7 +36,21 @@ func tell_story():
 
 func end_game():
 	$Blackboard/TextBox.queue_free()
-	$Blackboard/SubmitTextButton/ButtonLabel.text = "Retry"
+	$Blackboard/SubmitTextButton/ButtonLabel.text = import_text.retry
 
 func is_story_done():
 	return playerWords.size() == current_story.prompt.size()
+
+func set_random_story():
+	var stories = get_from_json("stories.json")
+	randomize()
+	current_story = stories[randi() % stories.size()]
+
+func get_from_json(filename):
+	var file = File.new()
+	# TODO: Add error validation for missing file
+	file.open(filename, File.READ)
+	var text = file.get_as_text()
+	var data = parse_json(text)
+	file.close()
+	return data
