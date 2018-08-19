@@ -1,12 +1,24 @@
 extends Node2D
 
 var playerWords = []
-var current_story = {
+var template = [
+		{
 		"prompt":['a name', 'a thing', 'a feeling', 'another feeling', 'some things'],
 		"story":"Once upon a time a %s ate a %s and felt very %s. It was a %s day for all good %s."
-}
+		},
+		{
+		"prompt":['a thing', 'a name', 'an adjective', 'a thing'],
+		"story":"There once was a %s called %s that lived as %s as a %s."
+		}
+	]
+
+var current_story
 
 func _ready():
+	randomize()
+	var ran_num = randi() % template.size()
+	print(ran_num)
+	current_story = template[ran_num]
 	$Blackboard/StoryText.text = "Welcome to the game. \nWe're going to tell a story and have a great time.\nCan I have " + current_story.prompt[playerWords.size()] + ", please?"
 	$Blackboard/TextBox.text = ""
 
